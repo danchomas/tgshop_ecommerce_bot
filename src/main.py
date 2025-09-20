@@ -5,8 +5,10 @@ from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from handlers.command_handlers import command_router
 from handlers.admin_handlers import admin_router
 from handlers.cart_handler import cart_router
+from handlers.menu_handlers import menu_router
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -28,8 +30,11 @@ bot = Bot(
 )
 dp = Dispatcher()
 
+# Подключаем все роутеры
+dp.include_router(command_router)
 dp.include_router(admin_router)
 dp.include_router(cart_router)
+dp.include_router(menu_router)
 
 async def main():
     logging.info("Бот запущен")

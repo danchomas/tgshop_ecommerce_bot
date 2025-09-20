@@ -3,3 +3,5 @@ venv/
 .ropeproject
 src/copy_project.py
 src/project_backup.txt
+*.db
+__pycache__
