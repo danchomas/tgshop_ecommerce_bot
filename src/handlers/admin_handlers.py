@@ -96,7 +96,6 @@ async def add_item_start(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.edit_text("Сначала создайте хотя бы одну категорию!")
         return
 
-    # Создаем клавиатуру с категориями
     category_buttons = []
     for category in categories:
         category_buttons.append([types.InlineKeyboardButton(text=category.name, callback_data=f"select_category_{category.id}")])
@@ -415,4 +414,6 @@ async def delete_item_confirmed(callback: types.CallbackQuery):
 
 @admin_router.callback_query(F.data == "admin_back")
 async def admin_back(callback: types.CallbackQuery):
-    await callback.message.edit_text("Добро пожаловать в админ-панель!", reply_markup=get_admin_main_keyboard())
+    from keyboards.admin_keyboards import get_admin_back_inline_keyboard
+    await callback.message.edit_text("Добро пожаловать в админ-панель!", reply_markup=get_admin_back_inline_keyboard())
+    await callback.answer()

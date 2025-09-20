@@ -43,6 +43,17 @@ def get_checkout_keyboard():
     return keyboard
 
 def get_back_to_main_keyboard():
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="📋 Меню")],
+            [KeyboardButton(text="🛒 Корзина")],
+            [KeyboardButton(text="❓ Помощь")]
+        ],
+        resize_keyboard=True
+    )
+    return keyboard
+
+def get_back_to_main_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_main")]

@@ -3,7 +3,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from services.cart_service import CartService
 from keyboards.cart_keyboards import *
-from keyboards.user_keyboards import get_main_menu_keyboard, get_cart_keyboard
+from keyboards.user_keyboards import get_main_menu_keyboard, get_back_to_main_inline_keyboard, get_cart_keyboard
 from data.database import get_db
 from services.item_services import ItemGetService
 import logging
@@ -45,7 +45,7 @@ async def view_cart(callback: types.CallbackQuery):
 
     if not cart_items:
         await callback.message.edit_text("🛒 <b>Ваша корзина пуста!</b>\n\nДобавьте товары из меню.",
-                                       reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
+                                       reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
         return
 
     cart_text = "🛒 <b>Ваша корзина:</b>\n\n"
@@ -97,11 +97,10 @@ async def confirm_order(callback: types.CallbackQuery, state: FSMContext):
 
     if not cart_items:
         await callback.message.edit_text("🛒 <b>Ваша корзина пуста!</b>",
-                                       reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
+                                       reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
         await state.clear()
         return
 
-    # Создаем текст заказа для админа
     order_text = f"📦 <b>НОВЫЙ ЗАКАЗ!</b>\n\n"
     order_text += f"👤 Пользователь: {user_name} (ID: {user_id})\n"
     order_text += f"🕒 Время: {callback.message.date.strftime('%d.%m.%Y %H:%M')}\n\n"
@@ -114,7 +113,6 @@ async def confirm_order(callback: types.CallbackQuery, state: FSMContext):
 
     order_text += f"\n<b>Итого: {total:.2f} руб.</b>"
 
-    # Отправляем уведомление админу
     try:
         from dotenv import load_dotenv
         import os
@@ -125,11 +123,10 @@ async def confirm_order(callback: types.CallbackQuery, state: FSMContext):
     except Exception as e:
         logging.error(f"Ошибка при отправке уведомления админу: {e}")
 
-    # Очищаем корзину
     cart_service.clear_cart(user_id)
 
     await callback.message.edit_text("✅ <b>Заказ успешно оформлен!</b>\n\nСпасибо за покупку! Администратор свяжется с вами для подтверждения.",
-                                   reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
+                                   reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
     await state.clear()
     await callback.answer()
 
@@ -144,7 +141,7 @@ async def clear_cart(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     cart_service.clear_cart(user_id)
     await callback.message.edit_text("🛒 <b>Корзина очищена!</b>",
-                                   reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
+                                   reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
     await callback.answer()
 
 @cart_router.callback_query(F.data.startswith("add_to_cart_"))
@@ -153,7 +150,6 @@ async def add_to_cart(callback: types.CallbackQuery):
         item_id = int(callback.data.split("_")[3])
         user_id = callback.from_user.id
 
-        # Получаем товар через сервис
         db_gen = get_db()
         db = next(db_gen)
         item_get_service = ItemGetService(db)

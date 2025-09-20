@@ -1,7 +1,6 @@
 from aiogram import Router, F, types
 from services.auth_service import AuthService
-from keyboards.user_keyboards import get_main_menu_keyboard
-from keyboards.admin_keyboards import get_admin_main_keyboard
+from keyboards.user_keyboards import get_main_menu_keyboard, get_back_to_main_inline_keyboard
 
 command_router = Router()
 
@@ -47,12 +46,11 @@ async def admin_command(message: types.Message):
     user = AuthService(message.from_user.id)
     is_admin = await user.isAdmin()
 
-    # Для отладки
     print(f"User ID: {message.from_user.id}")
-    print(f"ADMIN_ID from env: {AuthService.__dict__.get('ADMIN_ID', 'Not set')}")
     print(f"Is admin: {is_admin}")
 
     if is_admin:
+        from keyboards.admin_keyboards import get_admin_main_keyboard
         await message.answer("👑 <b>Админ-панель</b>", reply_markup=get_admin_main_keyboard(), parse_mode="HTML")
     else:
         await message.answer("🚫 У вас нет доступа к админ-панели.", reply_markup=get_main_menu_keyboard())
@@ -63,5 +61,5 @@ async def go_back(message: types.Message):
 
 @command_router.callback_query(F.data == "back_to_main")
 async def back_to_main(callback: types.CallbackQuery):
-    await callback.message.edit_text("🏠 <b>Главное меню</b>", reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
+    await callback.message.edit_text("🏠 <b>Главное меню</b>", reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
     await callback.answer()

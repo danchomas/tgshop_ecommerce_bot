@@ -70,3 +70,11 @@ def get_item_edit_keyboard(item_id):
         ]
     )
     return keyboard
+
+def get_admin_back_inline_keyboard():
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="admin_back")]
+        ]
+    )
+    return keyboard

@@ -65,7 +65,6 @@ class CartService:
 
         cart = self.get_cart(user_id)
 
-        # Получаем товар через ваш сервис
         db_gen = get_db()
         db = next(db_gen)
         item_get_service = ItemGetService(db)
