@@ -1,16 +1,21 @@
+# Обработчики меню
 from aiogram import Router, F, types
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
 from data.database import get_db
 from services.category_services import CategoryGetService
 from services.item_services import ItemGetService
 from keyboards.user_keyboards import get_back_to_main_keyboard, get_back_to_main_inline_keyboard
 import logging
 
+# Роутер для меню
 menu_router = Router()
 
+# Состояния для просмотра меню
 class MenuStates(StatesGroup):
     viewing_category = State()
 
+# Показ меню по кнопке и команде
 @menu_router.message(F.text == "📋 Меню")
 @menu_router.message(F.text == "/menu")
 async def show_menu(message: types.Message):
@@ -37,6 +42,7 @@ async def show_menu(message: types.Message):
 
     await message.answer("📋 <b>Выберите категорию:</b>", reply_markup=keyboard, parse_mode="HTML")
 
+# Показ товаров в выбранной категории
 @menu_router.message(F.text.regexp(r'^[A-Za-zА-Яа-яЁё0-9\s\-_]+$'))
 async def show_category_items(message: types.Message):
     category_name = message.text
@@ -85,6 +91,7 @@ async def show_category_items(message: types.Message):
 
     await message.answer(items_text, reply_markup=keyboard, parse_mode="HTML")
 
+# Добавление товара в корзину
 @menu_router.callback_query(F.data.startswith("add_to_cart_"))
 async def add_to_cart(callback: types.CallbackQuery):
     try:
@@ -114,6 +121,7 @@ async def add_to_cart(callback: types.CallbackQuery):
         logging.error(f"Ошибка при добавлении в корзину: {e}")
         await callback.answer("Произошла ошибка!")
 
+# Возврат к категориям
 @menu_router.callback_query(F.data == "back_to_categories")
 async def back_to_categories(callback: types.CallbackQuery):
     await callback.message.edit_text("📋 <b>Выберите категорию:</b>", reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")

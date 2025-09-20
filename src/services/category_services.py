@@ -1,11 +1,14 @@
+# Работа с категориями
 from typing import Optional, List
 from sqlalchemy.orm import Session
-from data.models import Category, MenuItem
+from data.models import Category
 
+# Базовый класс для сервисов категорий
 class CategoryServiceBase:
     def __init__(self, db: Session):
         self.db = db
 
+# Сервис добавления категорий
 class CategoryAddService(CategoryServiceBase):
     def add_category(self, key: str, name: str) -> Optional[Category]:
         try:
@@ -18,6 +21,7 @@ class CategoryAddService(CategoryServiceBase):
             self.db.rollback()
             return None
 
+# Сервис получения категорий
 class CategoryGetService(CategoryServiceBase):
     def get_category(self, category_id: int) -> Optional[Category]:
         return self.db.query(Category).filter(Category.id == category_id).first()
@@ -28,6 +32,7 @@ class CategoryGetService(CategoryServiceBase):
     def get_all_categories(self) -> List[Category]:
         return self.db.query(Category).all()
 
+# Сервис редактирования категорий
 class CategoryEditService(CategoryServiceBase):
     def update_category(self, category_id: int, key: str = None, name: str = None) -> Optional[Category]:
         category = self.db.query(Category).filter(Category.id == category_id).first()
@@ -47,6 +52,7 @@ class CategoryEditService(CategoryServiceBase):
             self.db.rollback()
             return None
 
+# Сервис удаления категорий
 class CategoryDeleteService(CategoryServiceBase):
     def delete_category(self, category_id: int) -> bool:
         category = self.db.query(Category).filter(Category.id == category_id).first()

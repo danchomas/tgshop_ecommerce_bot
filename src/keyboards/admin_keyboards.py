@@ -1,5 +1,7 @@
+# Клавиатуры для администраторов
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 
+# Главное меню администратора
 def get_admin_main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -12,6 +14,7 @@ def get_admin_main_keyboard():
     )
     return keyboard
 
+# Клавиатура управления меню
 def get_menu_management_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -24,6 +27,7 @@ def get_menu_management_keyboard():
     )
     return keyboard
 
+# Клавиатура управления заказами
 def get_orders_management_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -35,6 +39,7 @@ def get_orders_management_keyboard():
     )
     return keyboard
 
+# Клавиатура категорий
 def get_categories_keyboard(categories):
     buttons = []
     for category in categories:
@@ -42,6 +47,7 @@ def get_categories_keyboard(categories):
     buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="menu_management")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+# Клавиатура товаров
 def get_items_keyboard(items):
     buttons = []
     for item in items:
@@ -49,6 +55,7 @@ def get_items_keyboard(items):
     buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="menu_management")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+# Клавиатура редактирования категории
 def get_category_edit_keyboard(category_id):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -59,6 +66,7 @@ def get_category_edit_keyboard(category_id):
     )
     return keyboard
 
+# Клавиатура редактирования товара
 def get_item_edit_keyboard(item_id):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -71,6 +79,7 @@ def get_item_edit_keyboard(item_id):
     )
     return keyboard
 
+# Клавиатура возврата в админку
 def get_admin_back_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[

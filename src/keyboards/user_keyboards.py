@@ -1,5 +1,7 @@
+# Клавиатуры для пользователей
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 
+# Главное меню пользователя
 def get_main_menu_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -11,6 +13,7 @@ def get_main_menu_keyboard():
     )
     return keyboard
 
+# Клавиатура корзины
 def get_cart_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -21,6 +24,7 @@ def get_cart_keyboard():
     )
     return keyboard
 
+# Клавиатура изменения количества товара
 def get_item_quantity_keyboard(item_id, quantity):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -33,6 +37,7 @@ def get_item_quantity_keyboard(item_id, quantity):
     )
     return keyboard
 
+# Клавиатура оформления заказа
 def get_checkout_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -42,6 +47,7 @@ def get_checkout_keyboard():
     )
     return keyboard
 
+# Клавиатура возврата в главное меню (reply)
 def get_back_to_main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
@@ -53,6 +59,7 @@ def get_back_to_main_keyboard():
     )
     return keyboard
 
+# Клавиатура возврата в главное меню (inline)
 def get_back_to_main_inline_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[

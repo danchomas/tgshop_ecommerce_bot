@@ -1,3 +1,4 @@
+# Точка входа в приложение
 import asyncio
 import os
 import logging
@@ -13,9 +14,10 @@ from handlers.menu_handlers import menu_router
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
+# Загрузка переменных окружения
 load_dotenv()
 
-# Проверка наличия токена
+# Получение токена бота и ID администратора из .env
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN не найден в .env файле")
@@ -24,18 +26,20 @@ ADMIN_ID = os.getenv("ADMIN_ID")
 if not ADMIN_ID:
     raise ValueError("ADMIN_ID не найден в .env файле")
 
+# Инициализация бота и диспетчера
 bot = Bot(
     token=BOT_TOKEN,
     default=DefaultBotProperties(parse_mode=ParseMode.HTML)
 )
 dp = Dispatcher()
 
-# Подключаем все роутеры
+# Подключение обработчиков
 dp.include_router(command_router)
 dp.include_router(admin_router)
 dp.include_router(cart_router)
 dp.include_router(menu_router)
 
+# Основная функция запуска бота
 async def main():
     logging.info("Бот запущен")
     await dp.start_polling(bot)

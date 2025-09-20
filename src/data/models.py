@@ -1,9 +1,12 @@
+# Модели базы данных
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
+# Базовый класс для всех моделей
 Base = declarative_base()
 
+# Модель категории товаров
 class Category(Base):
     __tablename__ = 'categories'
 
@@ -12,6 +15,7 @@ class Category(Base):
     name = Column(String, nullable=False)
     items = relationship("MenuItem", back_populates="category")
 
+# Модель товара меню
 class MenuItem(Base):
     __tablename__ = 'menu_items'
 

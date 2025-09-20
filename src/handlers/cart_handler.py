@@ -1,3 +1,4 @@
+# Обработчики корзины
 from aiogram import Router, F, types
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -8,12 +9,15 @@ from data.database import get_db
 from services.item_services import ItemGetService
 import logging
 
+# Роутер для корзины
 cart_router = Router()
 cart_service = CartService()
 
+# Состояния для оформления заказа
 class CartStates(StatesGroup):
     waiting_for_order_confirmation = State()
 
+# Показ корзины по кнопке и команде
 @cart_router.message(F.text == "🛒 Корзина")
 @cart_router.message(F.text == "/cart")
 async def show_cart(message: types.Message):
@@ -38,6 +42,7 @@ async def show_cart(message: types.Message):
 
     await message.answer(cart_text, reply_markup=get_cart_keyboard(), parse_mode="HTML")
 
+# Показ корзины по callback
 @cart_router.callback_query(F.data == "view_cart")
 async def view_cart(callback: types.CallbackQuery):
     user_id = callback.from_user.id
@@ -62,6 +67,7 @@ async def view_cart(callback: types.CallbackQuery):
     await callback.message.edit_text(cart_text, reply_markup=get_cart_keyboard(), parse_mode="HTML")
     await callback.answer()
 
+# Начало оформления заказа
 @cart_router.callback_query(F.data == "checkout")
 async def checkout_start(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
@@ -69,7 +75,7 @@ async def checkout_start(callback: types.CallbackQuery, state: FSMContext):
 
     if not cart_items:
         await callback.message.edit_text("🛒 <b>Ваша корзина пуста!</b>",
-                                       reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
+                                       reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
         return
 
     order_text = "📦 <b>Подтверждение заказа:</b>\n\n"
@@ -88,6 +94,7 @@ async def checkout_start(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(CartStates.waiting_for_order_confirmation)
     await callback.answer()
 
+# Подтверждение заказа
 @cart_router.callback_query(F.data == "confirm_order")
 async def confirm_order(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
@@ -130,12 +137,14 @@ async def confirm_order(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.answer()
 
+# Отмена оформления заказа
 @cart_router.callback_query(F.data == "cancel_order_process")
 async def cancel_order_process(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("🛒 <b>Ваша корзина:</b>", reply_markup=get_cart_keyboard(), parse_mode="HTML")
     await state.clear()
     await callback.answer()
 
+# Очистка корзины
 @cart_router.callback_query(F.data == "clear_cart")
 async def clear_cart(callback: types.CallbackQuery):
     user_id = callback.from_user.id
@@ -144,6 +153,7 @@ async def clear_cart(callback: types.CallbackQuery):
                                    reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
     await callback.answer()
 
+# Добавление товара в корзину
 @cart_router.callback_query(F.data.startswith("add_to_cart_"))
 async def add_to_cart(callback: types.CallbackQuery):
     try:
@@ -171,6 +181,7 @@ async def add_to_cart(callback: types.CallbackQuery):
         logging.error(f"Ошибка при добавлении в корзину: {e}")
         await callback.answer("Произошла ошибка!")
 
+# Увеличение количества товара
 @cart_router.callback_query(F.data.startswith("increase_"))
 async def increase_quantity(callback: types.CallbackQuery):
     try:
@@ -187,6 +198,7 @@ async def increase_quantity(callback: types.CallbackQuery):
         logging.error(f"Ошибка при увеличении количества: {e}")
         await callback.answer("Ошибка!")
 
+# Уменьшение количества товара
 @cart_router.callback_query(F.data.startswith("decrease_"))
 async def decrease_quantity(callback: types.CallbackQuery):
     try:
@@ -203,6 +215,7 @@ async def decrease_quantity(callback: types.CallbackQuery):
         logging.error(f"Ошибка при уменьшении количества: {e}")
         await callback.answer("Ошибка!")
 
+# Удаление товара из корзины
 @cart_router.callback_query(F.data.startswith("remove_"))
 async def remove_from_cart(callback: types.CallbackQuery):
     try:

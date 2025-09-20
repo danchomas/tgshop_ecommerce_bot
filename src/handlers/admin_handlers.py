@@ -1,3 +1,4 @@
+# Админские обработчики
 from aiogram import Router, F, types
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -11,8 +12,10 @@ from services.item_services import (
     ItemGetService, ItemAddService, ItemEditService, ItemDeleteService
 )
 
+# Роутер для админских функций
 admin_router = Router()
 
+# Состояния для админских операций
 class AdminStates(StatesGroup):
     waiting_for_category_name = State()
     waiting_for_category_key = State()
@@ -25,6 +28,7 @@ class AdminStates(StatesGroup):
     waiting_for_edit_item_description = State()
     waiting_for_edit_item_price = State()
 
+# Обработчик команды /admin
 @admin_router.message(F.text == "/admin")
 async def admin_start(message: types.Message):
     user = AuthService(message.from_user.id)
@@ -33,6 +37,7 @@ async def admin_start(message: types.Message):
     else:
         await message.answer("У вас нет доступа к админ-панели.")
 
+# Обработчик кнопки "Управление меню"
 @admin_router.message(F.text == "🍽️ Управление меню")
 async def menu_management(message: types.Message):
     user = AuthService(message.from_user.id)
@@ -41,6 +46,7 @@ async def menu_management(message: types.Message):
     else:
         await message.answer("У вас нет доступа.")
 
+# Обработчик кнопки "Заказы"
 @admin_router.message(F.text == "📦 Заказы")
 async def orders_management(message: types.Message):
     user = AuthService(message.from_user.id)
@@ -49,17 +55,20 @@ async def orders_management(message: types.Message):
     else:
         await message.answer("У вас нет доступа.")
 
+# Начало добавления категории
 @admin_router.callback_query(F.data == "add_category")
 async def add_category_start(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Введите ключ категории (латинские буквы, без пробелов):")
     await state.set_state(AdminStates.waiting_for_category_key)
 
+# Получение ключа категории
 @admin_router.message(AdminStates.waiting_for_category_key)
 async def add_category_key_received(message: types.Message, state: FSMContext):
     await state.update_data(category_key=message.text)
     await message.answer("Введите название категории:")
     await state.set_state(AdminStates.waiting_for_category_name)
 
+# Получение названия категории и добавление в БД
 @admin_router.message(AdminStates.waiting_for_category_name)
 async def add_category_name_received(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
@@ -84,6 +93,7 @@ async def add_category_name_received(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Начало добавления товара
 @admin_router.callback_query(F.data == "add_item")
 async def add_item_start(callback: types.CallbackQuery, state: FSMContext):
     db_gen = get_db()
@@ -105,6 +115,7 @@ async def add_item_start(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Выберите категорию для товара:", reply_markup=keyboard)
     await state.set_state(AdminStates.waiting_for_item_category)
 
+# Выбор категории для товара
 @admin_router.callback_query(F.data.startswith("select_category_"))
 async def category_selected(callback: types.CallbackQuery, state: FSMContext):
     category_id = int(callback.data.split("_")[2])
@@ -112,18 +123,21 @@ async def category_selected(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Введите название товара:")
     await state.set_state(AdminStates.waiting_for_item_name)
 
+# Получение названия товара
 @admin_router.message(AdminStates.waiting_for_item_name)
 async def item_name_received(message: types.Message, state: FSMContext):
     await state.update_data(item_name=message.text)
     await message.answer("Введите описание товара:")
     await state.set_state(AdminStates.waiting_for_item_description)
 
+# Получение описания товара
 @admin_router.message(AdminStates.waiting_for_item_description)
 async def item_description_received(message: types.Message, state: FSMContext):
     await state.update_data(item_description=message.text)
     await message.answer("Введите цену товара:")
     await state.set_state(AdminStates.waiting_for_item_price)
 
+# Получение цены товара и добавление в БД
 @admin_router.message(AdminStates.waiting_for_item_price)
 async def item_price_received(message: types.Message, state: FSMContext):
     try:
@@ -157,6 +171,7 @@ async def item_price_received(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Редактирование категорий
 @admin_router.callback_query(F.data == "edit_categories")
 async def edit_categories(callback: types.CallbackQuery):
     db_gen = get_db()
@@ -172,6 +187,7 @@ async def edit_categories(callback: types.CallbackQuery):
     keyboard = get_categories_keyboard(categories)
     await callback.message.edit_text("Выберите категорию для редактирования:", reply_markup=keyboard)
 
+# Редактирование товаров
 @admin_router.callback_query(F.data == "edit_items")
 async def edit_items(callback: types.CallbackQuery):
     db_gen = get_db()
@@ -187,12 +203,14 @@ async def edit_items(callback: types.CallbackQuery):
     keyboard = get_items_keyboard(items)
     await callback.message.edit_text("Выберите товар для редактирования:", reply_markup=keyboard)
 
+# Выбор категории для редактирования
 @admin_router.callback_query(F.data.startswith("edit_category_"))
 async def edit_category(callback: types.CallbackQuery):
     category_id = int(callback.data.split("_")[2])
     keyboard = get_category_edit_keyboard(category_id)
     await callback.message.edit_text("Выберите действие:", reply_markup=keyboard)
 
+# Начало редактирования названия категории
 @admin_router.callback_query(F.data.startswith("edit_category_name_"))
 async def edit_category_name_start(callback: types.CallbackQuery, state: FSMContext):
     category_id = int(callback.data.split("_")[3])
@@ -200,6 +218,7 @@ async def edit_category_name_start(callback: types.CallbackQuery, state: FSMCont
     await callback.message.edit_text("Введите новое название категории:")
     await state.set_state(AdminStates.waiting_for_edit_category_name)
 
+# Получение нового названия категории и обновление в БД
 @admin_router.message(AdminStates.waiting_for_edit_category_name)
 async def edit_category_name_received(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
@@ -224,6 +243,7 @@ async def edit_category_name_received(message: types.Message, state: FSMContext)
     await state.clear()
     await message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Подтверждение удаления категории
 @admin_router.callback_query(F.data.startswith("delete_category_"))
 async def delete_category_confirm(callback: types.CallbackQuery):
     category_id = int(callback.data.split("_")[2])
@@ -244,6 +264,7 @@ async def delete_category_confirm(callback: types.CallbackQuery):
     else:
         await callback.message.edit_text("Категория не найдена!")
 
+# Удаление категории из БД
 @admin_router.callback_query(F.data.startswith("confirm_delete_category_"))
 async def delete_category_confirmed(callback: types.CallbackQuery):
     category_id = int(callback.data.split("_")[3])
@@ -265,12 +286,14 @@ async def delete_category_confirmed(callback: types.CallbackQuery):
 
     await callback.message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Выбор товара для редактирования
 @admin_router.callback_query(F.data.startswith("edit_item_"))
 async def edit_item(callback: types.CallbackQuery):
     item_id = int(callback.data.split("_")[2])
     keyboard = get_item_edit_keyboard(item_id)
     await callback.message.edit_text("Выберите действие:", reply_markup=keyboard)
 
+# Начало редактирования названия товара
 @admin_router.callback_query(F.data.startswith("edit_item_name_"))
 async def edit_item_name_start(callback: types.CallbackQuery, state: FSMContext):
     item_id = int(callback.data.split("_")[3])
@@ -278,6 +301,7 @@ async def edit_item_name_start(callback: types.CallbackQuery, state: FSMContext)
     await callback.message.edit_text("Введите новое название товара:")
     await state.set_state(AdminStates.waiting_for_edit_item_name)
 
+# Получение нового названия товара и обновление в БД
 @admin_router.message(AdminStates.waiting_for_edit_item_name)
 async def edit_item_name_received(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
@@ -302,6 +326,7 @@ async def edit_item_name_received(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Начало редактирования описания товара
 @admin_router.callback_query(F.data.startswith("edit_item_desc_"))
 async def edit_item_desc_start(callback: types.CallbackQuery, state: FSMContext):
     item_id = int(callback.data.split("_")[3])
@@ -309,6 +334,7 @@ async def edit_item_desc_start(callback: types.CallbackQuery, state: FSMContext)
     await callback.message.edit_text("Введите новое описание товара:")
     await state.set_state(AdminStates.waiting_for_edit_item_description)
 
+# Получение нового описания товара и обновление в БД
 @admin_router.message(AdminStates.waiting_for_edit_item_description)
 async def edit_item_desc_received(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
@@ -333,6 +359,7 @@ async def edit_item_desc_received(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Начало редактирования цены товара
 @admin_router.callback_query(F.data.startswith("edit_item_price_"))
 async def edit_item_price_start(callback: types.CallbackQuery, state: FSMContext):
     item_id = int(callback.data.split("_")[3])
@@ -340,6 +367,7 @@ async def edit_item_price_start(callback: types.CallbackQuery, state: FSMContext
     await callback.message.edit_text("Введите новую цену товара:")
     await state.set_state(AdminStates.waiting_for_edit_item_price)
 
+# Получение новой цены товара и обновление в БД
 @admin_router.message(AdminStates.waiting_for_edit_item_price)
 async def edit_item_price_received(message: types.Message, state: FSMContext):
     try:
@@ -371,6 +399,7 @@ async def edit_item_price_received(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Подтверждение удаления товара
 @admin_router.callback_query(F.data.startswith("delete_item_"))
 async def delete_item_confirm(callback: types.CallbackQuery):
     item_id = int(callback.data.split("_")[2])
@@ -391,6 +420,7 @@ async def delete_item_confirm(callback: types.CallbackQuery):
     else:
         await callback.message.edit_text("Товар не найден!")
 
+# Удаление товара из БД
 @admin_router.callback_query(F.data.startswith("confirm_delete_item_"))
 async def delete_item_confirmed(callback: types.CallbackQuery):
     item_id = int(callback.data.split("_")[3])
@@ -412,6 +442,7 @@ async def delete_item_confirmed(callback: types.CallbackQuery):
 
     await callback.message.answer("Управление меню:", reply_markup=get_menu_management_keyboard())
 
+# Возврат в админ-панель
 @admin_router.callback_query(F.data == "admin_back")
 async def admin_back(callback: types.CallbackQuery):
     from keyboards.admin_keyboards import get_admin_back_inline_keyboard

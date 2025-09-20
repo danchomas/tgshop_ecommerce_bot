@@ -1,9 +1,12 @@
+# Обработчики команд
 from aiogram import Router, F, types
 from services.auth_service import AuthService
 from keyboards.user_keyboards import get_main_menu_keyboard, get_back_to_main_inline_keyboard
 
+# Роутер для команд
 command_router = Router()
 
+# Обработчик команды /start
 @command_router.message(F.text == "/start")
 async def start_command(message: types.Message):
     welcome_text = """
@@ -18,6 +21,7 @@ async def start_command(message: types.Message):
     """
     await message.answer(welcome_text, reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
 
+# Обработчик команды /help и кнопки помощи
 @command_router.message(F.text == "/help")
 @command_router.message(F.text == "❓ Помощь")
 async def help_command(message: types.Message):
@@ -41,6 +45,7 @@ async def help_command(message: types.Message):
     """
     await message.answer(help_text, parse_mode="HTML", reply_markup=get_main_menu_keyboard())
 
+# Обработчик команды /admin
 @command_router.message(F.text == "/admin")
 async def admin_command(message: types.Message):
     user = AuthService(message.from_user.id)
@@ -55,10 +60,12 @@ async def admin_command(message: types.Message):
     else:
         await message.answer("🚫 У вас нет доступа к админ-панели.", reply_markup=get_main_menu_keyboard())
 
+# Обработчик кнопки "Назад"
 @command_router.message(F.text == "⬅️ Назад")
 async def go_back(message: types.Message):
     await message.answer("🏠 <b>Главное меню</b>", reply_markup=get_main_menu_keyboard(), parse_mode="HTML")
 
+# Обработчик callback "Назад в главное меню"
 @command_router.callback_query(F.data == "back_to_main")
 async def back_to_main(callback: types.CallbackQuery):
     await callback.message.edit_text("🏠 <b>Главное меню</b>", reply_markup=get_back_to_main_inline_keyboard(), parse_mode="HTML")
