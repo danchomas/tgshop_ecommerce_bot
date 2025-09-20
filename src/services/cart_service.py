@@ -1,4 +1,5 @@
-from data.menu_repository import MenuRepository
+from data.database import get_db
+from services.item_services import ItemGetService
 
 class CartService:
     _instance = None
@@ -16,8 +17,12 @@ class CartService:
 
     def add_to_cart(self, user_id: int, item_id: int) -> bool:
         cart = self.get_cart(user_id)
-        repo = MenuRepository()
-        item = repo.get_item_by_id(item_id)
+
+        db_gen = get_db()
+        db = next(db_gen)
+        item_get_service = ItemGetService(db)
+        item = item_get_service.get_item(item_id)
+        db.close()
 
         if not item:
             return False
@@ -59,8 +64,13 @@ class CartService:
             return True
 
         cart = self.get_cart(user_id)
-        repo = MenuRepository()
-        item = repo.get_item_by_id(item_id)
+
+        # Получаем товар через ваш сервис
+        db_gen = get_db()
+        db = next(db_gen)
+        item_get_service = ItemGetService(db)
+        item = item_get_service.get_item(item_id)
+        db.close()
 
         if not item or item_id not in cart:
             return False

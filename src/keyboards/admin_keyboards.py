@@ -45,7 +45,7 @@ def get_categories_keyboard(categories):
 def get_items_keyboard(items):
     buttons = []
     for item in items:
-        buttons.append([InlineKeyboardButton(text=item.name, callback_data=f"edit_item_{item.id}")])
+        buttons.append([InlineKeyboardButton(text=f"{item.name} - {item.price} руб.", callback_data=f"edit_item_{item.id}")])
     buttons.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="menu_management")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
