@@ -6,3 +6,4 @@ src/project_backup.txt
 *.db
 __pycache__
 .coverage
+.pytest_cache
