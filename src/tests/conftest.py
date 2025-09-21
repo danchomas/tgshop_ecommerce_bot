@@ -3,7 +3,7 @@ import sys
 import os
 import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, patch
+from unittest.mock import Mock, AsyncMock
 
 # Добавляем src в путь поиска модулей
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))

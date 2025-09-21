@@ -21,35 +21,23 @@ def run_tests():
         # Запуск всех тестов
         ["pytest", "-v", "--tb=short"],
 
-        # Запуск только модульных тестов
-        ["pytest", "-v", "tests/unit", "--tb=short"],
-
-        # Запуск только интеграционных тестов
-        ["pytest", "-v", "tests/integration", "--tb=short"],
-
         # Запуск тестов с покрытием
         ["pytest", "--cov=src", "--cov-report=html", "--cov-report=term"],
     ]
 
     print("Выберите тип тестов для запуска:")
     print("1. Все тесты")
-    print("2. Только модульные тесты")
-    print("3. Только интеграционные тесты")
-    print("4. Все тесты с покрытием")
-    print("5. Выход")
+    print("2. Все тесты с покрытием")
+    print("3. Выход")
 
     try:
-        choice = input("Введите номер (1-5): ").strip()
+        choice = input("Введите номер: ").strip()
 
         if choice == "1":
             cmd = test_commands[0]
         elif choice == "2":
             cmd = test_commands[1]
         elif choice == "3":
-            cmd = test_commands[2]
-        elif choice == "4":
-            cmd = test_commands[3]
-        elif choice == "5":
             print("Выход...")
             return True
         else:
