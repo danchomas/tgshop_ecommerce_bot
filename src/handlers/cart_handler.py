@@ -109,7 +109,7 @@ async def confirm_order(callback: types.CallbackQuery, state: FSMContext):
         return
 
     order_text = f"📦 <b>НОВЫЙ ЗАКАЗ!</b>\n\n"
-    order_text += f"👤 Пользователь: {user_name} (ID: {user_id})\n"
+    order_text += f"👤 Пользователь: {user_name})\n"
     order_text += f"🕒 Время: {callback.message.date.strftime('%d.%m.%Y %H:%M')}\n\n"
     order_text += "<b>Состав заказа:</b>\n"
 

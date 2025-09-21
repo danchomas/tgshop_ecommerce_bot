@@ -5,9 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeybo
 def get_admin_main_keyboard():
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="📊 Статистика")],
             [KeyboardButton(text="🍽️ Управление меню")],
-            [KeyboardButton(text="📦 Заказы")],
             [KeyboardButton(text="⬅️ Назад")]
         ],
         resize_keyboard=True
