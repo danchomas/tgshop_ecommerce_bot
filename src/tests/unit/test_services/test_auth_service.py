@@ -14,7 +14,10 @@ class TestAuthService:
         auth_service = AuthService(123456789)
 
         # Выполняем асинхронный метод
-        result = asyncio.run(auth_service.isAdmin())
+        async def run_test():
+            return await auth_service.isAdmin()
+
+        result = asyncio.run(run_test())
 
         assert result is True
 
@@ -25,7 +28,10 @@ class TestAuthService:
         auth_service = AuthService(123456789)
 
         # Выполняем асинхронный метод
-        result = asyncio.run(auth_service.isAdmin())
+        async def run_test():
+            return await auth_service.isAdmin()
+
+        result = asyncio.run(run_test())
 
         assert result is False
 
@@ -36,6 +42,9 @@ class TestAuthService:
         auth_service = AuthService(123456789)
 
         # Выполняем асинхронный метод
-        result = asyncio.run(auth_service.isAdmin())
+        async def run_test():
+            return await auth_service.isAdmin()
+
+        result = asyncio.run(run_test())
 
         assert result is False
